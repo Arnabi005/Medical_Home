@@ -2,8 +2,21 @@
 
 # dependencies
 node_modules/
+backend/node_modules/
+frontend/node_modules/
 
-# Expo
+# Frontend builds
+frontend/dist/
+
+# Environment files
+.env
+.env*.local
+backend/.env
+frontend/.env
+!backend/.env.example
+!frontend/.env.example
+
+# Expo (Preserved)
 .expo/
 dist/
 web-build/
@@ -21,7 +34,7 @@ expo-env.d.ts
 # Metro
 .metro-health-check*
 
-# debug
+# debug logs
 npm-debug.*
 yarn-debug.*
 yarn-error.*
@@ -29,9 +42,6 @@ yarn-error.*
 # macOS
 .DS_Store
 *.pem
-
-# local env files
-.env*.local
 
 # typescript
 *.tsbuildinfo

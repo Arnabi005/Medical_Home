@@ -1,56 +1,107 @@
-# Welcome to your Expo app 👋
+# MediCore Hospital Management System
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+MediCore is a comprehensive, modular-monolith hospital management system built with **React + Vite** (frontend) and **Node.js + Express + Prisma + PostgreSQL** (backend).
 
-## Get started
+This repository houses the shared modular monolith for the four-member development team, along with preserved native mobile configurations.
 
-1. Install dependencies
+---
 
-   ```bash
-   npm install
-   ```
+## 🏛 Team Roles & Architecture
 
-2. Start the app
+| Team Member | Module Scope | Responsibilities |
+| :--- | :--- | :--- |
+| **Member 1** | Shared Infrastructure & Auth | PostgreSQL schema, Prisma migrations, JWT Auth, API contracts, centralized error handling |
+| **Member 2 (Current Focus)** | **Patient & Appointment Management** | Patient registration & profiles, emergency contacts, doctor directory, appointment booking, slot generation, double-booking prevention, queue tracking |
+| **Member 3** | Clinical & EHR Module | Medical history, vitals, prescriptions, doctor consultation notes |
+| **Member 4** | Billing & Administration | Invoices, insurance processing, pharmacy management |
 
-   ```bash
-   npx expo start
-   ```
+---
 
-In the output, you'll find options to open the app in a
+## 🚀 Technology Stack
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- **Frontend**: React 18, Vite, JavaScript ES6+ (JSX), Tailwind CSS, React Router v6, Axios, Lucide Icons.
+- **Backend**: Node.js, Express.js (ES Modules), Prisma ORM, PostgreSQL, Morgan logger, CORS.
+- **Mobile Assets**: Preserved Expo React Native mobile project files.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+---
 
-## Get a fresh project
+## 📁 Repository Structure
 
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+Medical_Home/
+├── backend/                  # Node.js + Express + Prisma API
+│   ├── prisma/
+│   │   └── schema.prisma     # Shared database models
+│   ├── src/
+│   │   ├── config/           # Database & Prisma client
+│   │   ├── middleware/       # Centralized error handler, request logger
+│   │   ├── routes/           # REST endpoints (/api/v1/health, etc.)
+│   │   ├── modules/
+│   │   │   ├── patients/     # Member 2: Patient management
+│   │   │   └── scheduling/   # Member 2: Appointments & queues
+│   │   ├── app.js
+│   │   └── server.js
+│   ├── .env.example
+│   └── package.json
+│
+├── frontend/                 # React + Vite Web Application
+│   ├── src/
+│   │   ├── api/client.js     # Shared Axios client
+│   │   ├── layouts/          # Responsive application layout
+│   │   ├── pages/            # Dashboard, Patients, Appointments
+│   │   ├── App.jsx           # React Router
+│   │   └── main.jsx
+│   ├── tailwind.config.js
+│   ├── vite.config.js
+│   ├── .env.example
+│   └── package.json
+│
+├── docs/                     # Architectural & API Contracts
+│   ├── architecture/ARCHITECTURE.md
+│   ├── database/DATABASE_DESIGN.md
+│   ├── api/API_CONTRACTS.md
+│   └── security/SECURITY.md
+│
+└── src/                      # Preserved Expo Mobile Application Files
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+---
 
-### Other setup steps
+## ⚙️ Quick Start
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+### 1. Backend Setup
 
-## Learn more
+```bash
+cd backend
+npm install
+npx prisma generate
 
-To learn more about developing your project with Expo, look at the following resources:
+# Create local .env from example
+cp .env.example .env
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+# Start development server
+npm run dev
+```
+Backend will start on `http://localhost:5000`. Test the health check endpoint:
+```bash
+curl http://localhost:5000/api/v1/health
+```
 
-## Join the community
+### 2. Frontend Setup
 
-Join our community of developers creating universal apps.
+```bash
+cd frontend
+npm install
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+# Start Vite dev server
+npm run dev
+```
+Frontend will be accessible at `http://localhost:5173`.
+
+---
+
+## 🔒 Security & Medical Data Guidelines
+
+1. **Patient Data Privacy**: Never store passwords or sensitive patient health data (PHI) in `localStorage`.
+2. **Access Control**: All endpoints enforce role-based access checks on the backend.
+3. **Double-Booking Prevention**: Enforced at both the service validation layer and database unique index level (`@@unique([doctorId, appointmentDate, appointmentTime])`).

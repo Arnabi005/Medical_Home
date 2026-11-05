@@ -1,0 +1,160 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ----------------------------------------------------
+// Core & Authentication (Owned by Member 1)
+// ----------------------------------------------------
+
+enum Role {
+  ADMIN
+  DOCTOR
+  NURSE
+  RECEPTIONIST
+  PATIENT
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  role      Role     @default(PATIENT)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  patientProfile Patient?
+  doctorProfile  DoctorProfile?
+
+  @@map("users")
+}
+
+// ----------------------------------------------------
+// Department & Doctor Directory (Shared / Member 2)
+// ----------------------------------------------------
+
+model Department {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  code        String   @unique
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  doctors      DoctorProfile[]
+  appointments Appointment[]
+
+  @@map("departments")
+}
+
+model DoctorProfile {
+  id             String      @id @default(uuid())
+  userId         String      @unique
+  user           User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  departmentId   String
+  department     Department  @relation(fields: [departmentId], references: [id])
+  licenseNumber  String      @unique
+  specialization String
+  qualification  String
+  experienceYears Int        @default(0)
+  consultationFee Decimal    @default(0.00) @db.Decimal(10, 2)
+  availableDays  String[]    @default(["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"])
+  availableTimeStart String  @default("09:00")
+  availableTimeEnd   String  @default("17:00")
+  slotDurationMinutes Int    @default(30)
+  isAvailable    Boolean     @default(true)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  appointments   Appointment[]
+
+  @@map("doctor_profiles")
+}
+
+// ----------------------------------------------------
+// Patient Management (Member 2 Responsibility)
+// ----------------------------------------------------
+
+model Patient {
+  id             String    @id @default(uuid())
+  patientId      String    @unique // Formatted ID e.g., MED-2026-0001
+  userId         String?   @unique
+  user           User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  firstName      String
+  lastName       String
+  dateOfBirth    DateTime
+  gender         Gender
+  bloodGroup     String?
+  phone          String
+  email          String?
+  address        String?
+  city           String?
+  state          String?
+  postalCode     String?
+  
+  // Emergency Contact
+  emergencyContactName     String?
+  emergencyContactPhone    String?
+  emergencyContactRelation String?
+
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  appointments   Appointment[]
+
+  @@map("patients")
+}
+
+// ----------------------------------------------------
+// Appointment & Queue Management (Member 2 Responsibility)
+// ----------------------------------------------------
+
+enum AppointmentStatus {
+  SCHEDULED
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  RESCHEDULED
+  NO_SHOW
+}
+
+model Appointment {
+  id              String            @id @default(uuid())
+  appointmentNumber String          @unique // e.g. APT-20261105-001
+  patientId       String
+  patient         Patient           @relation(fields: [patientId], references: [id], onDelete: Restrict)
+  doctorId        String
+  doctor          DoctorProfile     @relation(fields: [doctorId], references: [id], onDelete: Restrict)
+  departmentId    String
+  department      Department        @relation(fields: [departmentId], references: [id], onDelete: Restrict)
+  appointmentDate DateTime          @db.Date
+  appointmentTime String            // e.g. "10:30"
+  status          AppointmentStatus @default(SCHEDULED)
+  queueNumber     Int?
+  reasonForVisit  String?
+  doctorNotes     String?
+  cancellationReason String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  // Composite unique index to avoid double bookings for the same doctor at the same slot
+  @@unique([doctorId, appointmentDate, appointmentTime])
+  @@index([patientId])
+  @@index([doctorId])
+  @@index([appointmentDate])
+  @@map("appointments")
+}
+
