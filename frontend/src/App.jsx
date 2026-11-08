@@ -61,6 +61,16 @@ export default function App() {
             }
           />
           <Route
+            path="login"
+            element={
+              <ModulePlaceholder
+                title="User Authentication"
+                description="Secure login portal for hospital staff, doctors, nurses, administrators, and patients."
+                stage="Auth Gateway"
+              />
+            }
+          />
+          <Route
             path="*"
             element={
               <ModulePlaceholder

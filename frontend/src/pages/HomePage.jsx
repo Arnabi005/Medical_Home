@@ -196,7 +196,7 @@ export default function HomePage() {
             </p>
           </div>
           <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-            <span className="text-xs font-semibold text-teal-700">Member 2 Responsibility</span>
+            <span className="text-xs font-semibold text-teal-700">Patient Care</span>
             <Link
               to="/patients"
               className="inline-flex items-center text-xs font-semibold text-teal-600 hover:text-teal-800"
@@ -219,7 +219,7 @@ export default function HomePage() {
             </p>
           </div>
           <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-            <span className="text-xs font-semibold text-blue-700">Member 2 Responsibility</span>
+            <span className="text-xs font-semibold text-blue-700">Scheduling Service</span>
             <Link
               to="/appointments"
               className="inline-flex items-center text-xs font-semibold text-blue-600 hover:text-blue-800"
