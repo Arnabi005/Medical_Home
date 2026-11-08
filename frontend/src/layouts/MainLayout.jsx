@@ -1,96 +1,131 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import {
-  Activity,
   Users,
   Calendar,
-  UserPlus,
-  Stethoscope,
   Building2,
-  Clock,
   Menu,
   X,
-  ShieldCheck,
-  Bell,
-  HeartPulse,
+  LogIn,
 } from 'lucide-react';
 
 export default function MainLayout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
 
+  // Navigation items: Patient, Appointment, Department
   const navigation = [
-    { name: 'Dashboard', href: '/', icon: Activity },
-    { name: 'Patients', href: '/patients', icon: Users, badge: 'Member 2' },
-    { name: 'Appointments', href: '/appointments', icon: Calendar, badge: 'Member 2' },
-    { name: 'Doctor Directory', href: '/doctors', icon: Stethoscope },
-    { name: 'Departments', href: '/departments', icon: Building2 },
-    { name: 'Reception Queue', href: '/queue', icon: Clock },
+    { name: 'Patient', href: '/patients', icon: Users },
+    { name: 'Appointment', href: '/appointments', icon: Calendar },
+    { name: 'Department', href: '/departments', icon: Building2 },
   ];
 
   const isActive = (path) => {
-    if (path === '/') return location.pathname === '/';
     return location.pathname.startsWith(path);
   };
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
-      {/* Top Header */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+      {/* Main Navbar */}
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center space-x-3">
+          <div className="relative flex items-center justify-between h-18 py-2">
+            
+            {/* Left Side: Mobile Menu Button (Mobile only) */}
+            <div className="flex items-center lg:hidden z-20">
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-slate-500 hover:text-slate-700 hover:bg-slate-100"
+                className="inline-flex items-center justify-center p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500"
                 aria-label="Toggle navigation menu"
               >
                 {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
               </button>
-              <Link to="/" className="flex items-center space-x-2">
-                <div className="bg-teal-600 text-white p-2 rounded-lg shadow-sm">
-                  <HeartPulse className="h-6 w-6" />
-                </div>
-                <div>
-                  <span className="text-xl font-bold tracking-tight text-slate-900">MediCore</span>
-                  <span className="hidden sm:inline-block ml-2 text-xs font-semibold px-2 py-0.5 bg-teal-50 text-teal-700 border border-teal-200 rounded-full">
-                    Hospital OS
-                  </span>
-                </div>
+            </div>
+
+            {/* Left Side: Navigation Menu (Desktop) */}
+            <nav className="hidden lg:flex items-center space-x-1 xl:space-x-2 z-10">
+              {navigation.map((item) => {
+                const active = isActive(item.href);
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.name}
+                    to={item.href}
+                    className={`inline-flex items-center px-3.5 py-2 text-sm font-medium rounded-lg transition-all duration-150 ${
+                      active
+                        ? 'bg-teal-50 text-teal-800 font-semibold border border-teal-200/80 shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80'
+                    }`}
+                  >
+                    <Icon className={`h-4 w-4 mr-2 ${active ? 'text-teal-600' : 'text-slate-400'}`} />
+                    <span>{item.name}</span>
+                  </Link>
+                );
+              })}
+            </nav>
+
+            {/* Middle: MediCore Logo and Branding (Centered) */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="pointer-events-auto">
+                <Link to="/" className="flex items-center space-x-2.5 group">
+                  {/* Modern Hospital/Healthcare Medical Cross & Pulse Emblem */}
+                  <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-tr from-teal-700 via-teal-600 to-emerald-500 text-white shadow-md shadow-teal-700/20 ring-1 ring-white/30 group-hover:scale-105 transition-transform duration-200">
+                    <svg
+                      viewBox="0 0 32 32"
+                      fill="none"
+                      className="w-6 h-6"
+                      xmlns="http://www.w3.org/2000/svg"
+                      aria-hidden="true"
+                    >
+                      <defs>
+                        <linearGradient id="crossPulseGrad" x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+                          <stop stopColor="#ffffff" stopOpacity="0.35" />
+                          <stop offset="1" stopColor="#ffffff" stopOpacity="0.15" />
+                        </linearGradient>
+                      </defs>
+                      {/* Medical Cross Motif */}
+                      <rect x="13" y="5" width="6" height="22" rx="2.5" fill="url(#crossPulseGrad)" />
+                      <rect x="5" y="13" width="22" height="6" rx="2.5" fill="url(#crossPulseGrad)" />
+                      {/* Pulse Beat Line */}
+                      <path
+                        d="M5 16H10.5L13 10.5L16.5 21.5L19.5 12.5L22 16H27"
+                        stroke="#ffffff"
+                        strokeWidth="2.3"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </div>
+                  <div className="flex flex-col text-left">
+                    <span className="text-xl font-bold tracking-tight text-slate-900 group-hover:text-teal-800 transition-colors leading-none">
+                      Medi<span className="text-teal-600">Core</span>
+                    </span>
+                    <span className="text-[10px] tracking-wider font-semibold uppercase text-slate-400 mt-0.5">
+                      Hospital
+                    </span>
+                  </div>
+                </Link>
+              </div>
+            </div>
+
+            {/* Right Side: ONLY Login Button */}
+            <div className="flex items-center justify-end z-10">
+              <Link
+                to="/login"
+                className="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold text-white bg-teal-600 hover:bg-teal-700 active:bg-teal-800 rounded-lg shadow-sm hover:shadow transition-all duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
+              >
+                <LogIn className="w-4 h-4 mr-1.5" />
+                <span>Login</span>
               </Link>
             </div>
 
-            {/* Desktop Quick Badges & Header Right */}
-            <div className="flex items-center space-x-4">
-              <div className="hidden lg:flex items-center space-x-2 text-xs font-medium text-slate-600 bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200">
-                <ShieldCheck className="h-4 w-4 text-emerald-600" />
-                <span>Member 2: Patient &amp; Appointment Module</span>
-              </div>
-              <button
-                type="button"
-                className="p-2 text-slate-500 hover:text-slate-700 rounded-full hover:bg-slate-100 relative"
-                aria-label="View notifications"
-              >
-                <Bell className="h-5 w-5" />
-                <span className="absolute top-1 right-1 w-2 h-2 bg-teal-500 rounded-full"></span>
-              </button>
-              <div className="flex items-center space-x-2 border-l border-slate-200 pl-4">
-                <div className="w-8 h-8 rounded-full bg-teal-700 text-white flex items-center justify-center font-bold text-xs">
-                  M2
-                </div>
-                <div className="hidden sm:block text-left text-xs">
-                  <p className="font-semibold text-slate-800">Hospital Staff</p>
-                  <p className="text-slate-500">Member 2 Station</p>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
 
-        {/* Desktop Navigation Bar */}
-        <nav className="hidden md:flex border-t border-slate-100 bg-slate-50/50 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto w-full flex space-x-1 py-1.5 overflow-x-auto">
+        {/* Mobile Drawer Menu */}
+        {mobileMenuOpen && (
+          <div className="lg:hidden bg-white border-t border-slate-200 px-4 pt-3 pb-4 space-y-1 shadow-lg">
             {navigation.map((item) => {
               const active = isActive(item.href);
               const Icon = item.icon;
@@ -98,57 +133,21 @@ export default function MainLayout() {
                 <Link
                   key={item.name}
                   to={item.href}
-                  className={`inline-flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center px-3 py-2.5 rounded-lg text-base font-medium transition-colors ${
                     active
-                      ? 'bg-teal-600 text-white shadow-sm'
-                      : 'text-slate-700 hover:bg-slate-200/70 hover:text-slate-900'
+                      ? 'bg-teal-50 text-teal-800 font-semibold border border-teal-200/70'
+                      : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
                   }`}
                 >
-                  <Icon className={`h-4 w-4 mr-2 ${active ? 'text-white' : 'text-slate-500'}`} />
-                  {item.name}
-                  {item.badge && !active && (
-                    <span className="ml-1.5 px-1.5 py-0.2 text-[10px] font-semibold bg-teal-100 text-teal-800 rounded">
-                      {item.badge}
-                    </span>
-                  )}
+                  <Icon className={`h-5 w-5 mr-3 ${active ? 'text-teal-600' : 'text-slate-400'}`} />
+                  <span>{item.name}</span>
                 </Link>
               );
             })}
           </div>
-        </nav>
+        )}
       </header>
-
-      {/* Mobile Drawer Menu */}
-      {mobileMenuOpen && (
-        <div className="md:hidden bg-white border-b border-slate-200 px-4 pt-2 pb-3 space-y-1 shadow-md">
-          {navigation.map((item) => {
-            const active = isActive(item.href);
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.name}
-                to={item.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center justify-between px-3 py-2 rounded-md text-base font-medium ${
-                  active
-                    ? 'bg-teal-600 text-white'
-                    : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
-                }`}
-              >
-                <div className="flex items-center space-x-3">
-                  <Icon className="h-5 w-5" />
-                  <span>{item.name}</span>
-                </div>
-                {item.badge && (
-                  <span className="text-xs px-2 py-0.5 rounded bg-teal-100 text-teal-800">
-                    {item.badge}
-                  </span>
-                )}
-              </Link>
-            );
-          })}
-        </div>
-      )}
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -167,4 +166,3 @@ export default function MainLayout() {
     </div>
   );
 }
-
