@@ -28,7 +28,30 @@ export function errorHandler(err, req, res, next) {
   let message = err.message || 'Internal Server Error';
   let details = err.details || null;
 
-  // Handle Prisma Known Request Errors
+  // Handle MongoDB / Mongoose Duplicate Key Error
+  if (err.code === 11000) {
+    statusCode = 409;
+    const field = Object.keys(err.keyValue || {}).join(', ') || 'field';
+    message = `Duplicate value violation: A record with this ${field} already exists.`;
+  }
+
+  // Handle Mongoose Validation Errors
+  if (err.name === 'ValidationError') {
+    statusCode = 400;
+    message = 'Validation failed';
+    details = Object.values(err.errors || {}).map((e) => ({
+      field: e.path,
+      message: e.message,
+    }));
+  }
+
+  // Handle Mongoose CastError (e.g. invalid ObjectId)
+  if (err.name === 'CastError') {
+    statusCode = 400;
+    message = `Invalid format for field '${err.path}': ${err.value}`;
+  }
+
+  // Handle Prisma Known Request Errors (Preserved for backwards compatibility)
   if (err.code === 'P2002') {
     statusCode = 409;
     const target = err.meta?.target ? err.meta.target.join(', ') : 'field';
@@ -46,7 +69,7 @@ export function errorHandler(err, req, res, next) {
 
   const response = {
     success: false,
-    status: err.status || (statusCode >= 500 ? 'error' : 'fail'),
+    status: statusCode >= 500 ? 'error' : 'fail',
     message,
   };
 
@@ -54,10 +77,10 @@ export function errorHandler(err, req, res, next) {
     response.details = details;
   }
 
-  if (process.env.NODE_ENV === 'development') {
-    response.stack = err.stack;
+  // Log server-side errors without leaking stack traces to clients
+  if (statusCode >= 500) {
+    console.error(`[Server Error ${statusCode}] ${message}:`, err.stack || err);
   }
 
   res.status(statusCode).json(response);
 }
-

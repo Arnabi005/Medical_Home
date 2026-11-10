@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api/v1';
 
 /**
  * Pre-configured Axios instance for MediCore API communication
@@ -55,6 +55,84 @@ apiClient.interceptors.response.use(
  */
 export async function fetchHealthStatus() {
   return apiClient.get('/health');
+}
+
+/**
+ * Departments API calls
+ */
+export async function fetchDepartments(params = {}) {
+  return apiClient.get('/departments', { params });
+}
+
+export async function createDepartment(departmentData) {
+  return apiClient.post('/departments', departmentData);
+}
+
+/**
+ * Patients API calls
+ */
+export async function fetchPatients(params = {}) {
+  return apiClient.get('/patients', { params });
+}
+
+export async function fetchPatientById(id) {
+  return apiClient.get(`/patients/${id}`);
+}
+
+export async function registerPatient(patientData) {
+  return apiClient.post('/patients', patientData);
+}
+
+/**
+ * Appointments API calls
+ */
+export async function fetchAppointments(params = {}) {
+  return apiClient.get('/appointments', { params });
+}
+
+export async function bookAppointment(appointmentData) {
+  return apiClient.post('/appointments', appointmentData);
+}
+
+export async function cancelAppointment(id, cancellationReason, cancelledBy) {
+  return apiClient.patch(`/appointments/${id}/cancel`, { cancellationReason, cancelledBy });
+}
+
+export async function updateAppointmentStatus(id, status, doctorNotes) {
+  return apiClient.patch(`/appointments/${id}/status`, { status, doctorNotes });
+}
+
+/**
+ * User login service call
+ * @param {{ email: string, password: string, role?: string }} credentials
+ */
+export async function loginUser(credentials) {
+  const response = await apiClient.post('/auth/login', credentials);
+  if (response.data?.token) {
+    sessionStorage.setItem('medicore_auth_token', response.data.token);
+    sessionStorage.setItem('medicore_user', JSON.stringify(response.data.user));
+  }
+  return response;
+}
+
+/**
+ * Clear user authentication session
+ */
+export function logoutUser() {
+  sessionStorage.removeItem('medicore_auth_token');
+  sessionStorage.removeItem('medicore_user');
+}
+
+/**
+ * Get active session user from storage
+ */
+export function getStoredUser() {
+  try {
+    const raw = sessionStorage.getItem('medicore_user');
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
 }
 
 export default apiClient;

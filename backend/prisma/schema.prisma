@@ -114,6 +114,7 @@ model Patient {
 
   appointments   Appointment[]
 
+  @@index([phone])
   @@map("patients")
 }
 
@@ -147,11 +148,18 @@ model Appointment {
   reasonForVisit  String?
   doctorNotes     String?
   cancellationReason String?
+
+  // Audit trail for scheduling & cancellation tracking
+  createdById     String?
+  cancelledById   String?
+  cancelledAt     DateTime?
+
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
 
-  // Composite unique index to avoid double bookings for the same doctor at the same slot
-  @@unique([doctorId, appointmentDate, appointmentTime])
+  // Double-booking prevention: Live slots checked via application transaction & partial unique index
+  // (Prevents CANCELLED/RESCHEDULED slots from blocking re-booking)
+  @@index([doctorId, appointmentDate, appointmentTime])
   @@index([patientId])
   @@index([doctorId])
   @@index([appointmentDate])

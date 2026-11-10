@@ -16,8 +16,10 @@ import {
   ShieldAlert,
 } from 'lucide-react';
 import { fetchHealthStatus } from '../api/client';
+import { useAuth } from '../context/AuthContext';
 
 export default function HomePage() {
+  const { user, isAuthenticated } = useAuth();
   const [health, setHealth] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -47,15 +49,23 @@ export default function HomePage() {
       {/* Hero Welcome Banner */}
       <div className="bg-gradient-to-r from-teal-800 to-teal-950 rounded-2xl p-6 sm:p-8 text-white shadow-lg">
         <div className="max-w-3xl">
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-teal-500/20 text-teal-200 border border-teal-400/30 mb-3">
-            MediCore Hospital Management System &bull; Initialized
-          </span>
+          <div className="flex flex-wrap items-center gap-2 mb-3">
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-teal-500/20 text-teal-200 border border-teal-400/30">
+              24/7 Healthcare Services &bull; Patient Care Portal
+            </span>
+            {isAuthenticated && user && (
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-200 border border-emerald-400/30">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1.5 animate-pulse"></span>
+                Active: <strong className="ml-1 text-white">{user.name || user.email}</strong> ({user.role})
+              </span>
+            )}
+          </div>
           <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight">
             Patient &amp; Appointment Management Center
           </h1>
           <p className="mt-3 text-sm sm:text-base text-teal-100 leading-relaxed">
-            Welcome to the centralized portal for patient registrations, medical profiles, doctor directories,
-            and real-time appointment scheduling with conflict-free double-booking prevention.
+            Welcome to MediCore Hospital. Access patient care services, view doctor schedules,
+            and book consultation appointments easily.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
@@ -76,21 +86,21 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Backend & Database Health Check Diagnostic Panel */}
+      {/* Hospital Connectivity & Services Status */}
       <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-100">
           <div>
             <div className="flex items-center space-x-2">
               <Server className="w-5 h-5 text-teal-600" />
-              <h2 className="text-lg font-bold text-slate-800">System &amp; Backend Connectivity</h2>
+              <h2 className="text-lg font-bold text-slate-800">Hospital System Status</h2>
             </div>
             <p className="text-xs text-slate-500 mt-1">
-              Live status pinging Express backend at <code className="bg-slate-100 px-1 py-0.5 rounded text-slate-700 font-mono">/api/v1/health</code>
+              Real-time operational status for hospital services and records
             </p>
           </div>
           <div className="flex items-center space-x-3">
             {lastChecked && (
-              <span className="text-xs text-slate-400">Last checked: {lastChecked}</span>
+              <span className="text-xs text-slate-400">Checked: {lastChecked}</span>
             )}
             <button
               onClick={checkHealth}
@@ -98,7 +108,7 @@ export default function HomePage() {
               className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors disabled:opacity-50"
             >
               <RefreshCw className={`w-3.5 h-3.5 mr-1.5 ${loading ? 'animate-spin' : ''}`} />
-              {loading ? 'Checking...' : 'Ping API'}
+              {loading ? 'Checking...' : 'Refresh'}
             </button>
           </div>
         </div>
@@ -115,10 +125,10 @@ export default function HomePage() {
             <div className="rounded-lg bg-rose-50 border border-rose-200 p-4 text-rose-800 text-sm flex items-start space-x-3">
               <AlertTriangle className="w-5 h-5 text-rose-600 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="font-semibold">Failed to connect to backend server</p>
+                <p className="font-semibold">Service Temporarily Unavailable</p>
                 <p className="text-xs text-rose-700 mt-1">{error}</p>
                 <p className="text-xs text-rose-600 mt-2">
-                  Ensure the Express server is running on port 5000 (<code className="bg-rose-100 px-1 py-0.5 rounded">npm run dev --prefix backend</code>).
+                  Please verify that the MediCore server is running.
                 </p>
               </div>
             </div>
@@ -126,40 +136,46 @@ export default function HomePage() {
 
           {health && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Express Server Status */}
+              {/* API Server Status */}
               <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Express Server</span>
+                  <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Hospital API</span>
                   <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
                     <CheckCircle2 className="w-3 h-3 mr-1" />
                     Online
                   </span>
                 </div>
-                <p className="text-sm font-bold text-slate-800">{health.service}</p>
+                <p className="text-sm font-bold text-slate-800">MediCore Core Services</p>
                 <p className="text-xs text-slate-500 mt-1">Uptime: {health.uptime}</p>
               </div>
 
-              {/* PostgreSQL & Prisma Status */}
+              {/* MongoDB Database Status */}
               <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">PostgreSQL (Prisma)</span>
+                  <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                    {health.database?.type === 'mongodb' ? 'MongoDB' : 'Database'}
+                  </span>
                   {health.database?.status === 'connected' ? (
                     <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
                       <CheckCircle2 className="w-3 h-3 mr-1" />
                       Connected
                     </span>
                   ) : (
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800" title="Configure DATABASE_URL with a running PostgreSQL instance">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800" title="Start MongoDB service or check MONGODB_URI">
                       <AlertTriangle className="w-3 h-3 mr-1" />
-                      Pending DB
+                      Disconnected
                     </span>
                   )}
                 </div>
                 <p className="text-sm font-bold text-slate-800">
-                  {health.database?.status === 'connected' ? 'PostgreSQL Active' : 'Waiting for Database'}
+                  {health.database?.status === 'connected'
+                    ? `${health.database?.database || 'medicore_db'}`
+                    : 'Waiting for Database'}
                 </p>
                 <p className="text-xs text-slate-500 mt-1 truncate" title={health.database?.message}>
-                  {health.database?.message}
+                  {health.database?.host
+                    ? `Host: ${health.database.host}`
+                    : health.database?.message}
                 </p>
               </div>
 
@@ -171,7 +187,7 @@ export default function HomePage() {
                     v1.0.0
                   </span>
                 </div>
-                <p className="text-sm font-bold text-slate-800">Member 2: Ready</p>
+                <p className="text-sm font-bold text-slate-800">MediCore API</p>
                 <p className="text-xs text-slate-500 mt-1">
                   Patients &bull; Scheduling &bull; Doctor Directory
                 </p>
