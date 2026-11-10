@@ -5,6 +5,42 @@ const router = Router();
 // Master appointments database
 let APPOINTMENTS = [
   {
+    id: 'apt_006',
+    appointmentNumber: 'APT-20261112-006',
+    patientId: 'MED-2026-0001',
+    patientName: 'Rina Das',
+    patientPhone: '+91 98765 43210',
+    doctorId: 'doc_sarah_01',
+    doctorName: 'Dr. Sarah Jenkins, MD',
+    departmentId: 'dept_card_01',
+    departmentName: 'Cardiology',
+    appointmentDate: '2026-11-12',
+    appointmentTime: '11:00',
+    queueNumber: 1,
+    status: 'PENDING',
+    reasonForVisit: 'New consultation booking - requires Admin Approval',
+    doctorNotes: null,
+    createdAt: '2026-11-10T19:00:00.000Z',
+  },
+  {
+    id: 'apt_007',
+    appointmentNumber: 'APT-20261112-007',
+    patientId: 'MED-2026-0002',
+    patientName: 'Amitabh Chatterjee',
+    patientPhone: '+91 94330 98124',
+    doctorId: 'doc_meera_05',
+    doctorName: 'Dr. Meera Iyer, MD',
+    departmentId: 'dept_genmed_05',
+    departmentName: 'General Medicine & Diabetology',
+    appointmentDate: '2026-11-12',
+    appointmentTime: '15:00',
+    queueNumber: 2,
+    status: 'PENDING',
+    reasonForVisit: 'Diabetes annual wellness checkup - awaiting triage approval',
+    doctorNotes: null,
+    createdAt: '2026-11-10T20:30:00.000Z',
+  },
+  {
     id: 'apt_001',
     appointmentNumber: 'APT-20261111-001',
     patientId: 'MED-2026-0001',
@@ -96,7 +132,7 @@ let APPOINTMENTS = [
   },
 ];
 
-let aptSeq = 6;
+let aptSeq = 8;
 
 /**
  * @route   GET /api/v1/appointments
@@ -277,6 +313,59 @@ router.patch('/:id/status', (req, res) => {
     success: true,
     message: `Appointment ${apt.appointmentNumber} status updated to ${status}.`,
     data: apt,
+  });
+});
+
+/**
+ * @route   PATCH /api/v1/appointments/:id/approve
+ * @desc    Admin accepts / approves a pending appointment
+ * @access  Admin only
+ */
+router.patch('/:id/approve', (req, res) => {
+  const { id } = req.params;
+
+  const apt = APPOINTMENTS.find((a) => a.id === id || a.appointmentNumber === id);
+  if (!apt) {
+    return res.status(404).json({
+      success: false,
+      status: 'fail',
+      message: `Appointment '${id}' not found.`,
+    });
+  }
+
+  apt.status = 'CONFIRMED';
+  apt.approvedAt = new Date().toISOString();
+  apt.approvedBy = req.body?.approvedBy || 'Hospital Administrator';
+
+  return res.status(200).json({
+    success: true,
+    message: `Appointment ${apt.appointmentNumber} has been approved and confirmed.`,
+    data: apt,
+  });
+});
+
+/**
+ * @route   DELETE /api/v1/appointments/:id
+ * @desc    Admin deletes an appointment record
+ * @access  Admin only
+ */
+router.delete('/:id', (req, res) => {
+  const { id } = req.params;
+  const index = APPOINTMENTS.findIndex((a) => a.id === id || a.appointmentNumber === id);
+
+  if (index === -1) {
+    return res.status(404).json({
+      success: false,
+      status: 'fail',
+      message: `Appointment '${id}' not found.`,
+    });
+  }
+
+  const [removed] = APPOINTMENTS.splice(index, 1);
+  return res.status(200).json({
+    success: true,
+    message: `Appointment ${removed.appointmentNumber} has been permanently deleted from records.`,
+    data: removed,
   });
 });
 

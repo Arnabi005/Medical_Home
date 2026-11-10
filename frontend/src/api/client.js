@@ -83,6 +83,10 @@ export async function registerPatient(patientData) {
   return apiClient.post('/patients', patientData);
 }
 
+export async function deletePatient(id) {
+  return apiClient.delete(`/patients/${id}`);
+}
+
 /**
  * Appointments API calls
  */
@@ -100,6 +104,14 @@ export async function cancelAppointment(id, cancellationReason, cancelledBy) {
 
 export async function updateAppointmentStatus(id, status, doctorNotes) {
   return apiClient.patch(`/appointments/${id}/status`, { status, doctorNotes });
+}
+
+export async function approveAppointment(id, approvedBy) {
+  return apiClient.patch(`/appointments/${id}/approve`, { approvedBy });
+}
+
+export async function deleteAppointment(id) {
+  return apiClient.delete(`/appointments/${id}`);
 }
 
 /**

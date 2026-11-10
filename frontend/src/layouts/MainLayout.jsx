@@ -12,6 +12,8 @@ import {
   ChevronDown,
   ShieldCheck,
   Stethoscope,
+  Activity,
+  Heart,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -47,17 +49,17 @@ export default function MainLayout() {
   const getRoleBadgeStyle = (role) => {
     switch (role?.toUpperCase()) {
       case 'DOCTOR':
-        return 'bg-emerald-100 text-emerald-800 border-emerald-300';
+        return 'bg-lightblue-100 text-lightblue-800 border-lightblue-300';
       case 'ADMIN':
-        return 'bg-purple-100 text-purple-800 border-purple-300';
+        return 'bg-neonrose-50 text-neonrose-700 border-neonrose-200';
       case 'RECEPTIONIST':
-        return 'bg-blue-100 text-blue-800 border-blue-300';
+        return 'bg-sky-100 text-sky-800 border-sky-300';
       case 'NURSE':
         return 'bg-teal-100 text-teal-800 border-teal-300';
       case 'PATIENT':
         return 'bg-amber-100 text-amber-800 border-amber-300';
       default:
-        return 'bg-slate-100 text-slate-800 border-slate-300';
+        return 'bg-slate-100 text-slate-800 border-slate-200';
     }
   };
 
@@ -72,9 +74,10 @@ export default function MainLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
-      {/* Main Navbar */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+    <div className="min-h-screen bg-lightblue-50 flex flex-col font-sans text-slate-800 selection:bg-neonrose-500 selection:text-white">
+      
+      {/* Main Navbar: Modern Glassmorphic Medical Aesthetic */}
+      <header className="glass-nav sticky top-0 z-30 transition-all duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-[72px] py-2 gap-2">
             
@@ -84,14 +87,14 @@ export default function MainLayout() {
                 <button
                   type="button"
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  className="inline-flex items-center justify-center p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  className="glass-pill inline-flex items-center justify-center p-2 rounded-xl text-slate-700 hover:text-sky-800 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-400"
                   aria-label="Toggle navigation menu"
                 >
-                  {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                  {mobileMenuOpen ? <X className="h-6 w-6 text-neonrose-500" /> : <Menu className="h-6 w-6" />}
                 </button>
               </div>
 
-              <nav className="hidden lg:flex items-center space-x-1 xl:space-x-2">
+              <nav className="hidden lg:flex items-center space-x-1.5 xl:space-x-2">
                 {navigation.map((item) => {
                   const active = isActive(item.href);
                   const Icon = item.icon;
@@ -99,13 +102,13 @@ export default function MainLayout() {
                     <Link
                       key={item.name}
                       to={item.href}
-                      className={`inline-flex items-center px-3.5 py-2 text-sm font-medium rounded-lg transition-all duration-150 ${
+                      className={`inline-flex items-center px-4 py-2 text-sm font-semibold rounded-xl transition-all duration-200 ${
                         active
-                          ? 'bg-teal-50 text-teal-800 font-semibold border border-teal-200/80 shadow-sm'
-                          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80'
+                          ? 'glass-pill-active text-sky-950 font-bold'
+                          : 'glass-pill text-slate-700 hover:text-sky-800 hover:bg-white/80'
                       }`}
                     >
-                      <Icon className={`h-4 w-4 mr-2 ${active ? 'text-teal-600' : 'text-slate-400'}`} />
+                      <Icon className={`h-4 w-4 mr-2 ${active ? 'text-sky-600' : 'text-slate-400'}`} />
                       <span>{item.name}</span>
                     </Link>
                   );
@@ -115,40 +118,45 @@ export default function MainLayout() {
 
             {/* Middle: MediCore Logo and Branding */}
             <div className="flex items-center justify-center">
-              <Link to="/" className="flex items-center space-x-2 sm:space-x-2.5 group">
-                {/* Modern Hospital/Healthcare Medical Cross & Pulse Emblem */}
-                <div className="relative flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-teal-700 via-teal-600 to-emerald-500 text-white shadow-md shadow-teal-700/20 ring-1 ring-white/30 group-hover:scale-105 transition-transform duration-200 shrink-0">
+              <Link to="/" className="flex items-center space-x-2 sm:space-x-3 group">
+                {/* Modern Hospital/Healthcare Medical Cross & Neon Rose Pulse Emblem */}
+                <div className="relative flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-tr from-lightblue-600 via-lightblue-500 to-sky-400 text-white shadow-md shadow-lightblue-500/25 ring-1 ring-lightblue-300/40 group-hover:scale-105 transition-transform duration-200 shrink-0">
                   <svg
                     viewBox="0 0 32 32"
                     fill="none"
-                    className="w-5 h-5 sm:w-6 sm:h-6"
+                    className="w-6 h-6 sm:w-7 sm:h-7"
                     xmlns="http://www.w3.org/2000/svg"
                     aria-hidden="true"
                   >
                     <defs>
-                      <linearGradient id="crossPulseGrad" x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
-                        <stop stopColor="#ffffff" stopOpacity="0.35" />
-                        <stop offset="1" stopColor="#ffffff" stopOpacity="0.15" />
+                      <linearGradient id="crossWhiteGrad" x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+                        <stop stopColor="#ffffff" stopOpacity="0.45" />
+                        <stop offset="1" stopColor="#ffffff" stopOpacity="0.2" />
                       </linearGradient>
+                      <filter id="neonRosePulseGlow" x="-20%" y="-20%" width="140%" height="140%">
+                        <feDropShadow dx="0" dy="0" stdDeviation="1.5" floodColor="#ff1464" floodOpacity="0.75" />
+                      </filter>
                     </defs>
                     {/* Medical Cross Motif */}
-                    <rect x="13" y="5" width="6" height="22" rx="2.5" fill="url(#crossPulseGrad)" />
-                    <rect x="5" y="13" width="22" height="6" rx="2.5" fill="url(#crossPulseGrad)" />
-                    {/* Pulse Beat Line */}
+                    <rect x="13" y="5" width="6" height="22" rx="2.5" fill="url(#crossWhiteGrad)" />
+                    <rect x="5" y="13" width="22" height="6" rx="2.5" fill="url(#crossWhiteGrad)" />
+                    {/* Neon Rose Pulse Beat Line */}
                     <path
                       d="M5 16H10.5L13 10.5L16.5 21.5L19.5 12.5L22 16H27"
-                      stroke="#ffffff"
-                      strokeWidth="2.3"
+                      stroke="#ff1464"
+                      strokeWidth="2.5"
                       strokeLinecap="round"
                       strokeLinejoin="round"
+                      filter="url(#neonRosePulseGlow)"
                     />
                   </svg>
                 </div>
                 <div className="flex flex-col text-left">
-                  <span className="text-lg sm:text-xl font-bold tracking-tight text-slate-900 group-hover:text-teal-800 transition-colors leading-none">
-                    Medi<span className="text-teal-600">Core</span>
+                  <span className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 group-hover:text-lightblue-700 transition-colors leading-none">
+                    Medi<span className="text-lightblue-600">Core</span>
                   </span>
-                  <span className="text-[10px] tracking-wider font-semibold uppercase text-slate-400 mt-0.5 hidden sm:inline">
+                  <span className="text-[10px] tracking-widest font-extrabold uppercase text-neonrose-500 mt-0.5 flex items-center">
+                    <span className="w-1.5 h-1.5 rounded-full bg-neonrose-500 mr-1 animate-pulse"></span>
                     Hospital
                   </span>
                 </div>
@@ -163,16 +171,19 @@ export default function MainLayout() {
                   <button
                     type="button"
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
-                    className="flex items-center space-x-2 p-1.5 sm:px-3 sm:py-1.5 rounded-xl border border-slate-200/90 hover:border-teal-300 hover:bg-slate-50 transition-all focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    className="glass-pill flex items-center space-x-2 p-1.5 sm:px-3 sm:py-1.5 rounded-xl hover:bg-white/90 transition-all focus:outline-none focus:ring-2 focus:ring-sky-400 shadow-xs"
                     aria-expanded={userMenuOpen}
                     aria-label="User profile menu"
                   >
                     {/* User Avatar Circle with Initials */}
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-teal-700 to-emerald-600 text-white flex items-center justify-center text-xs font-bold shadow-xs">
+                    <div
+                      className="w-8 h-8 rounded-lg bg-sky-600 text-white flex items-center justify-center text-xs font-bold shadow-xs shrink-0"
+                      style={{ backgroundColor: '#0284c7', color: '#ffffff' }}
+                    >
                       {getUserInitials(user.name, user.email)}
                     </div>
 
-                    {/* Name & Role (Hidden on small mobile screens) */}
+                    {/* Name & Role */}
                     <div className="hidden sm:flex flex-col text-left">
                       <span className="text-xs font-bold text-slate-800 leading-tight truncate max-w-[120px] md:max-w-[160px]">
                         {user.name || user.email}
@@ -193,18 +204,21 @@ export default function MainLayout() {
 
                     <ChevronDown
                       className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-150 ${
-                        userMenuOpen ? 'rotate-180' : ''
+                        userMenuOpen ? 'rotate-180 text-sky-600' : ''
                       }`}
                     />
                   </button>
 
-                  {/* Dropdown Menu Panel */}
+                  {/* Dropdown Menu Panel with Glassmorphism */}
                   {userMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-slate-200 py-2 z-50 animate-fade-in">
+                    <div className="glass-dropdown absolute right-0 mt-2 w-64 rounded-2xl py-2 z-50 animate-fade-in">
                       {/* User Summary Card */}
-                      <div className="px-4 py-3 border-b border-slate-100 bg-slate-50/60">
+                      <div className="px-4 py-3 border-b border-sky-100/70 bg-sky-50/50">
                         <div className="flex items-center space-x-2.5">
-                          <div className="w-10 h-10 rounded-lg bg-teal-600 text-white flex items-center justify-center font-bold text-sm shadow-xs">
+                          <div
+                            className="w-10 h-10 rounded-xl bg-sky-600 text-white flex items-center justify-center font-bold text-sm shadow-xs shrink-0"
+                            style={{ backgroundColor: '#0284c7', color: '#ffffff' }}
+                          >
                             {getUserInitials(user.name, user.email)}
                           </div>
                           <div className="truncate">
@@ -213,7 +227,7 @@ export default function MainLayout() {
                           </div>
                         </div>
 
-                        <div className="mt-2.5 flex items-center justify-between text-[11px] pt-2 border-t border-slate-200/60">
+                        <div className="mt-2.5 flex items-center justify-between text-[11px] pt-2 border-t border-lightblue-200/60">
                           <span className="text-slate-500 font-medium">Designated Role:</span>
                           <span
                             className={`px-1.5 py-0.5 font-bold uppercase rounded border text-[10px] ${getRoleBadgeStyle(
@@ -227,31 +241,31 @@ export default function MainLayout() {
                         {user.department && (
                           <div className="mt-1 flex items-center justify-between text-[11px]">
                             <span className="text-slate-500 font-medium">Department:</span>
-                            <span className="text-slate-700 font-semibold truncate max-w-[130px]">{user.department}</span>
+                            <span className="text-lightblue-700 font-semibold truncate max-w-[130px]">{user.department}</span>
                           </div>
                         )}
 
                         {user.patientId && (
                           <div className="mt-1 flex items-center justify-between text-[11px]">
                             <span className="text-slate-500 font-medium">Patient ID:</span>
-                            <span className="text-slate-700 font-mono font-semibold">{user.patientId}</span>
+                            <span className="text-neonrose-600 font-mono font-semibold">{user.patientId}</span>
                           </div>
                         )}
 
-                        <div className="mt-2 flex items-center text-[10px] text-emerald-700">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>
+                        <div className="mt-2 flex items-center text-[10px] text-lightblue-700">
+                          <span className="w-1.5 h-1.5 rounded-full bg-lightblue-500 mr-1.5 animate-pulse"></span>
                           <span>Active MediCore Session</span>
                         </div>
                       </div>
 
-                      {/* Quick Profile/Help Links */}
+                      {/* Quick Profile/Portal Links */}
                       <div className="px-2 py-1">
                         <Link
                           to={user.role === 'PATIENT' ? '/patients' : '/appointments'}
                           onClick={() => setUserMenuOpen(false)}
-                          className="flex items-center w-full px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+                          className="flex items-center w-full px-3 py-2 text-xs font-semibold text-slate-700 hover:text-lightblue-700 hover:bg-lightblue-50 rounded-xl transition-colors"
                         >
-                          <User className="w-3.5 h-3.5 mr-2 text-slate-400" />
+                          <User className="w-3.5 h-3.5 mr-2 text-lightblue-600" />
                           <span>My Healthcare Portal</span>
                         </Link>
                       </div>
@@ -264,9 +278,9 @@ export default function MainLayout() {
                             logout();
                             setUserMenuOpen(false);
                           }}
-                          className="flex items-center w-full px-3 py-2 text-xs font-semibold text-rose-700 hover:bg-rose-50 rounded-lg transition-colors"
+                          className="flex items-center w-full px-3 py-2 text-xs font-bold text-neonrose-600 hover:bg-neonrose-50 rounded-xl transition-colors"
                         >
-                          <LogOut className="w-3.5 h-3.5 mr-2 text-rose-600" />
+                          <LogOut className="w-3.5 h-3.5 mr-2 text-neonrose-500" />
                           <span>Sign Out</span>
                         </button>
                       </div>
@@ -277,10 +291,11 @@ export default function MainLayout() {
                 /* Unauthenticated Login Button */
                 <Link
                   to="/login"
-                  className="inline-flex items-center justify-center px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold text-white bg-teal-600 hover:bg-teal-700 active:bg-teal-800 rounded-lg shadow-sm hover:shadow transition-all duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
+                  style={{ backgroundColor: '#0284c7', color: '#ffffff' }}
+                  className="inline-flex items-center justify-center px-4 py-2 text-xs sm:text-sm font-bold text-white bg-sky-600 hover:bg-sky-500 active:bg-sky-700 rounded-xl shadow-md shadow-sky-600/25 transition-all duration-150 ease-in-out border border-sky-400/30 focus:outline-none focus:ring-2 focus:ring-sky-400"
                 >
-                  <LogIn className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-1.5" />
-                  <span>Login</span>
+                  <LogIn className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-1.5 text-white" />
+                  <span className="text-white font-bold">Login</span>
                 </Link>
               )}
             </div>
@@ -288,14 +303,16 @@ export default function MainLayout() {
           </div>
         </div>
 
-        {/* Mobile Drawer Menu */}
+        {/* Mobile Drawer Menu with Glassmorphism */}
         {mobileMenuOpen && (
-          <div className="lg:hidden bg-white border-t border-slate-200 px-4 pt-3 pb-4 space-y-2 shadow-lg">
-            {/* Authenticated User Banner in Mobile Menu */}
+          <div className="lg:hidden glass-dropdown border-t border-sky-100/70 px-4 pt-3 pb-4 space-y-2 shadow-2xl">
             {isAuthenticated && user && (
-              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 mb-2">
+              <div className="p-3 bg-white/70 rounded-xl border border-sky-200/60 mb-2 shadow-xs">
                 <div className="flex items-center space-x-2.5">
-                  <div className="w-9 h-9 rounded-lg bg-teal-600 text-white flex items-center justify-center font-bold text-xs shadow-xs">
+                  <div
+                    className="w-9 h-9 rounded-lg bg-sky-600 text-white flex items-center justify-center font-bold text-xs shadow-xs"
+                    style={{ backgroundColor: '#0284c7', color: '#ffffff' }}
+                  >
                     {getUserInitials(user.name, user.email)}
                   </div>
                   <div className="truncate">
@@ -321,20 +338,20 @@ export default function MainLayout() {
                   key={item.name}
                   to={item.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center px-3 py-2.5 rounded-lg text-base font-medium transition-colors ${
+                  className={`flex items-center px-3.5 py-2.5 rounded-xl text-base font-semibold transition-all ${
                     active
-                      ? 'bg-teal-50 text-teal-800 font-semibold border border-teal-200/70'
-                      : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
+                      ? 'glass-pill-active text-sky-950 font-bold'
+                      : 'glass-pill text-slate-700 hover:text-sky-800 hover:bg-white/90'
                   }`}
                 >
-                  <Icon className={`h-5 w-5 mr-3 ${active ? 'text-teal-600' : 'text-slate-400'}`} />
+                  <Icon className={`h-5 w-5 mr-3 ${active ? 'text-sky-600' : 'text-slate-400'}`} />
                   <span>{item.name}</span>
                 </Link>
               );
             })}
 
             {/* Mobile Auth Button */}
-            <div className="pt-2 border-t border-slate-200">
+            <div className="pt-2 border-t border-lightblue-200">
               {isAuthenticated && user ? (
                 <button
                   type="button"
@@ -342,19 +359,20 @@ export default function MainLayout() {
                     logout();
                     setMobileMenuOpen(false);
                   }}
-                  className="flex items-center w-full px-3 py-2.5 rounded-lg text-sm font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 transition-colors"
+                  className="flex items-center w-full px-3 py-2.5 rounded-xl text-sm font-bold text-neonrose-700 bg-neonrose-50 hover:bg-neonrose-100 transition-colors border border-neonrose-200"
                 >
-                  <LogOut className="h-4 w-4 mr-2.5 text-rose-600" />
+                  <LogOut className="h-4 w-4 mr-2.5 text-neonrose-500" />
                   <span>Sign Out ({user.name || user.email})</span>
                 </button>
               ) : (
                 <Link
                   to="/login"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-center w-full px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-teal-600 hover:bg-teal-700 transition-colors"
+                  style={{ backgroundColor: '#0284c7', color: '#ffffff' }}
+                  className="flex items-center justify-center w-full px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-sky-600 hover:bg-sky-500 shadow-md transition-colors"
                 >
-                  <LogIn className="h-4 w-4 mr-2" />
-                  <span>Login</span>
+                  <LogIn className="h-4 w-4 mr-2 text-white" />
+                  <span className="text-white font-bold">Login</span>
                 </Link>
               )}
             </div>
@@ -367,12 +385,18 @@ export default function MainLayout() {
         <Outlet />
       </main>
 
-      {/* Hospital Footer */}
-      <footer className="bg-white border-t border-slate-200 py-4 mt-auto">
+      {/* Hospital Footer: Clean Light Blue */}
+      <footer className="bg-white border-t border-lightblue-200 py-5 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center sm:flex sm:justify-between sm:items-center text-xs text-slate-500">
-          <p>© 2026 MediCore Hospital Management System. All rights reserved.</p>
-          <p className="mt-1 sm:mt-0 text-slate-600">
-            Emergency Helpline: <span className="font-semibold text-teal-700">1800-MEDICORE</span> &bull; 24/7 Patient Care
+          <p className="flex items-center justify-center sm:justify-start">
+            <span className="w-2 h-2 rounded-full bg-lightblue-500 mr-2"></span>
+            &copy; 2026 MediCore Hospital Management System. All rights reserved.
+          </p>
+          <p className="mt-2 sm:mt-0 text-slate-700 flex items-center justify-center">
+            Emergency Helpline: <span className="font-extrabold text-neonrose-600 ml-1.5 flex items-center">
+              <span className="w-1.5 h-1.5 rounded-full bg-neonrose-500 animate-ping mr-1"></span>
+              1800-MEDICORE
+            </span> &bull; <span className="text-lightblue-700 font-semibold ml-1">24/7 Patient Care</span>
           </p>
         </div>
       </footer>

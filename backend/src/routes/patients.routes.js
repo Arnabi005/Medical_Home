@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { registerUserAccount } from './auth.routes.js';
 
 const router = Router();
 
@@ -229,6 +230,7 @@ router.post('/', (req, res) => {
     bloodGroup,
     phone,
     email,
+    password,
     address,
     city,
     state,
@@ -250,6 +252,15 @@ router.post('/', (req, res) => {
     });
   }
 
+  // Ensure password meets standard length if registering credentials
+  if (password && password.length < 6) {
+    return res.status(400).json({
+      success: false,
+      status: 'fail',
+      message: 'Password must be at least 6 characters long.',
+    });
+  }
+
   // Format safe sequential Patient ID (MED-2026-XXXX)
   const padSeq = String(nextSeq++).padStart(4, '0');
   const generatedId = `MED-2026-${padSeq}`;
@@ -258,6 +269,8 @@ router.post('/', (req, res) => {
   const birthYear = new Date(dateOfBirth).getFullYear();
   const currentYear = new Date().getFullYear();
   const age = Math.max(0, currentYear - birthYear);
+
+  const patientEmail = email ? email.trim() : `${firstName.toLowerCase()}.${lastName.toLowerCase()}@patient.medicore`;
 
   const newPatient = {
     id: `pat_${Date.now()}`,
@@ -269,7 +282,7 @@ router.post('/', (req, res) => {
     age,
     bloodGroup: bloodGroup || 'Unknown',
     phone: phone.trim(),
-    email: email ? email.trim() : `${firstName.toLowerCase()}.${lastName.toLowerCase()}@patient.medicore`,
+    email: patientEmail,
     address: address || 'Not provided',
     city: city || 'Kolkata',
     state: state || 'West Bengal',
@@ -292,10 +305,50 @@ router.post('/', (req, res) => {
 
   PATIENTS.unshift(newPatient);
 
+  // If password was provided (or default password assigned), register portal login account
+  const assignedPassword = password || 'password123';
+  registerUserAccount({
+    email: patientEmail,
+    password: assignedPassword,
+    name: `${firstName} ${lastName}`,
+    role: 'PATIENT',
+    patientId: generatedId,
+  });
+
   return res.status(201).json({
     success: true,
-    message: `Patient ${firstName} ${lastName} successfully registered with Medical ID ${generatedId}.`,
+    message: `Patient ${firstName} ${lastName} successfully registered with Medical ID ${generatedId}. Portal login account created!`,
     data: newPatient,
+    account: {
+      email: patientEmail,
+      patientId: generatedId,
+      canLogin: true,
+    },
+  });
+});
+
+/**
+ * @route   DELETE /api/v1/patients/:id
+ * @desc    Delete patient record (Admin only)
+ * @access  Admin
+ */
+router.delete('/:id', (req, res) => {
+  const { id } = req.params;
+  const index = PATIENTS.findIndex((p) => p.id === id || p.patientId === id);
+
+  if (index === -1) {
+    return res.status(404).json({
+      success: false,
+      status: 'fail',
+      message: `Patient with ID '${id}' was not found.`,
+    });
+  }
+
+  const [removed] = PATIENTS.splice(index, 1);
+  return res.status(200).json({
+    success: true,
+    message: `Patient record '${removed.firstName} ${removed.lastName}' (${removed.patientId}) deleted successfully.`,
+    data: removed,
   });
 });
 

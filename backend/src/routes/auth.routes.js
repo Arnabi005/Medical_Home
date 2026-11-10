@@ -2,39 +2,66 @@ import { Router } from 'express';
 
 const router = Router();
 
-// Demo hospital staff and patient accounts for testing
+// In-memory registered user account credentials (persisting newly registered patients)
+export const REGISTERED_ACCOUNTS = new Map();
+
+// Pre-seeded demo hospital staff and patient accounts for testing
 const DEMO_ACCOUNTS = {
   'admin@medicore.hospital': {
     id: 'usr_admin_001',
     name: 'Hospital Administrator',
+    password: 'password123',
     role: 'ADMIN',
     department: 'Hospital Administration',
   },
   'doctor@medicore.hospital': {
     id: 'usr_doc_002',
     name: 'Dr. Sarah Jenkins, MD',
+    password: 'password123',
     role: 'DOCTOR',
     department: 'Cardiology',
   },
   'reception@medicore.hospital': {
     id: 'usr_rec_003',
     name: 'Priya Sharma (Desk 1)',
+    password: 'password123',
     role: 'RECEPTIONIST',
     department: 'Front Desk & Admissions',
   },
   'nurse@medicore.hospital': {
     id: 'usr_nur_004',
     name: 'Nurse David Miller, RN',
+    password: 'password123',
     role: 'NURSE',
     department: 'Intensive Care Unit',
   },
   'patient@medicore.hospital': {
     id: 'usr_pat_005',
     name: 'Rina Das',
+    password: 'password123',
     role: 'PATIENT',
     patientId: 'MED-2026-0001',
   },
 };
+
+/**
+ * Register a new user credential for future portal login
+ */
+export function registerUserAccount({ email, password, name, role = 'PATIENT', patientId, department }) {
+  const normalizedEmail = email.toLowerCase().trim();
+  const account = {
+    id: `usr_${Date.now()}`,
+    email: normalizedEmail,
+    password: password || 'password123',
+    name: name || email.split('@')[0],
+    role: role.toUpperCase(),
+    patientId: patientId || null,
+    department: department || null,
+    createdAt: new Date().toISOString(),
+  };
+  REGISTERED_ACCOUNTS.set(normalizedEmail, account);
+  return account;
+}
 
 /**
  * @route   POST /api/v1/auth/login
@@ -70,15 +97,31 @@ router.post('/login', async (req, res) => {
     });
   }
 
-  // Check known demo accounts or synthesize authenticated session
   const normalizedEmail = email.toLowerCase().trim();
-  const matched = DEMO_ACCOUNTS[normalizedEmail];
+
+  // 1. Check newly registered patient / staff accounts
+  let matched = REGISTERED_ACCOUNTS.get(normalizedEmail);
+
+  // 2. Fallback to pre-seeded demo accounts
+  if (!matched) {
+    matched = DEMO_ACCOUNTS[normalizedEmail];
+  }
+
+  // If account was specifically registered with a password, enforce password verification
+  if (matched && matched.password && matched.password !== password) {
+    return res.status(401).json({
+      success: false,
+      status: 'fail',
+      message: 'Invalid password. Please verify your credentials and try again.',
+    });
+  }
 
   const userRole = role || matched?.role || 'PATIENT';
   const userName = matched?.name || email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
   const userId = matched?.id || `usr_${Date.now()}`;
+  const patientId = matched?.patientId || (userRole === 'PATIENT' ? `MED-2026-0001` : null);
 
-  // Generate lightweight mock JWT token for session
+  // Generate lightweight session JWT token
   const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url');
   const payload = Buffer.from(
     JSON.stringify({
@@ -86,6 +129,7 @@ router.post('/login', async (req, res) => {
       email: normalizedEmail,
       role: userRole,
       name: userName,
+      patientId,
       iat: Math.floor(Date.now() / 1000),
       exp: Math.floor(Date.now() / 1000) + 7 * 24 * 3600,
     })
@@ -104,7 +148,7 @@ router.post('/login', async (req, res) => {
         name: userName,
         role: userRole,
         department: matched?.department || null,
-        patientId: matched?.patientId || null,
+        patientId,
       },
     },
   });
